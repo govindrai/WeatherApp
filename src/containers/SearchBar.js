@@ -1,13 +1,14 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import getWeatherActionCreator from "../actions/getWeatherActionCreator";
+import { fetchWeather as fetchWeatherActionCreator } from "../actions/fetchWeatherActionCreator";
 
 class SearchBar extends Component {
   constructor(props) {
     super(props);
     this.state = { searchTerm: "" };
     this.onChangeHandler = this.onChangeHandler.bind(this);
+    this.onSubmitHandler = this.onSubmitHandler.bind(this);
   }
 
   onChangeHandler(event) {
@@ -18,12 +19,8 @@ class SearchBar extends Component {
 
   onSubmitHandler(event) {
     event.preventDefault();
-    const url = `https://api.openweathermap.org/data/2.5/forecast?q=${this.state
-      .searchTerm},us&appid=0c0d5451b069323bb6170294b1655f20`;
-
-    axios.get(url, response => {
-      console.log(response);
-    });
+    this.props.fetchWeather(this.state.searchTerm);
+    this.setState({ searchTerm: "" });
   }
 
   render() {
@@ -36,11 +33,7 @@ class SearchBar extends Component {
           value={this.state.searchTerm}
         />
         <span className="input-group-btn">
-          <button
-            onClick={this.props.getWeather}
-            type="submit"
-            className="btn btn-secondary"
-          >
+          <button type="submit" className="btn btn-secondary">
             Search
           </button>
         </span>
@@ -49,13 +42,11 @@ class SearchBar extends Component {
   }
 }
 
-function mapStateToProps(state) {
-  return {
-    searchTerm: state.searchTerm
-  };
-}
 function mapDispatchToProps(dispatch) {
-  return bindActionCreators({ getWeather: getWeatherActionCreator }, dispatch);
+  return bindActionCreators(
+    { fetchWeather: fetchWeatherActionCreator },
+    dispatch
+  );
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(SearchBar);
+export default connect(null, mapDispatchToProps)(SearchBar);
